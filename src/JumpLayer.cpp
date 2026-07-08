@@ -1,5 +1,4 @@
 #include "JumpLayer.hpp"
-#include <fmod/FMODAudioEngine.h>
 
 JumpLayer* JumpLayer::create(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     auto ret = new JumpLayer();
@@ -17,10 +16,8 @@ bool JumpLayer::init(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     m_gameLayer = gameLayer;
     m_isPlayer2 = isPlayer2;
     
-    // Глобальная пауза игры
+    // Останавливаем только игру
     CCDirector::sharedDirector()->pause();
-    // Пауза музыки через FMOD
-    FMODAudioEngine::sharedEngine()->pauseAll();
     
     std::random_device rd;
     m_rng.seed(rd());
@@ -199,9 +196,8 @@ void JumpLayer::finishTorture() {
     JumpLayer::jumpApproved = true;
     JumpLayer::isTortureActive = false;
     
-    // Возобновляем игру и музыку
+    // Возобновляем игру
     CCDirector::sharedDirector()->resume();
-    FMODAudioEngine::sharedEngine()->resumeAll();
     
     if (m_gameLayer) {
         bool isPlayer1 = !m_isPlayer2; 
