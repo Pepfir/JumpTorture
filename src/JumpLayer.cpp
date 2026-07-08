@@ -1,5 +1,5 @@
 #include "JumpLayer.hpp"
-#include <Geode/cocos/include/FMODAudioEngine.h>
+#include <fmod/FMODAudioEngine.h>
 
 JumpLayer* JumpLayer::create(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     auto ret = new JumpLayer();
@@ -17,8 +17,9 @@ bool JumpLayer::init(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     m_gameLayer = gameLayer;
     m_isPlayer2 = isPlayer2;
     
-    // Пауза игры и музыки
+    // Глобальная пауза игры
     CCDirector::sharedDirector()->pause();
+    // Пауза музыки через FMOD
     FMODAudioEngine::sharedEngine()->pauseAll();
     
     std::random_device rd;
@@ -88,7 +89,7 @@ void JumpLayer::generateStage() {
         m_inputNode->setVisible(true);
         m_confirmBtn->setVisible(true);
         
-        // ... (логика этапов прежняя, оставь свою)
+        // Логика этапов
         if (m_currentStage == 2) {
             std::uniform_int_distribution<> dist(10, 50);
             int a = dist(m_rng), b = dist(m_rng);
@@ -151,7 +152,6 @@ void JumpLayer::generateStage() {
 }
 
 void JumpLayer::keyDown(enumKeyCodes key, double timestamp) {
-    // Обработка Enter
     if (key == KEY_Enter || key == KEY_KP_Enter) {
         onConfirm(nullptr);
         return;
