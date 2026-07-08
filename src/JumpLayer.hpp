@@ -34,8 +34,6 @@ protected:
 
 public:
     static JumpLayer* create(GJBaseGameLayer* gameLayer, bool isPlayer2);
-    
-    // Используем inline, чтобы они были доступны везде без ошибок линковки
     inline static bool isTortureActive = false;
     inline static bool jumpApproved = false;
 };
