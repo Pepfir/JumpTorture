@@ -29,8 +29,8 @@ protected:
 
     virtual void registerWithTouchDispatcher() override;
     
-    // Windows-сигнатура (без double timestamp)
-    virtual void keyDown(enumKeyCodes key) override;
+    // ВОТ ЗДЕСЬ ИЗМЕНЕНИЕ: мы добавили "double timestamp"
+    virtual void keyDown(enumKeyCodes key, double timestamp) override;
     
     virtual bool ccTouchBegan(CCTouch* touch, CCEvent* event) override;
     virtual void keyBackClicked() override;
