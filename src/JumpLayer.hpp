@@ -29,8 +29,8 @@ protected:
 
     virtual void registerWithTouchDispatcher() override;
     
-    // Вот здесь убрали "override", из-за этого была ошибка
-    void keyDown(enumKeyCodes key);
+    // Windows требует timestamp, иначе не видит переопределение
+    virtual void keyDown(enumKeyCodes key, double timestamp) override;
     
     virtual bool ccTouchBegan(CCTouch* touch, CCEvent* event) override;
     virtual void keyBackClicked() override;
