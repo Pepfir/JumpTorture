@@ -16,8 +16,8 @@ bool JumpLayer::init(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     m_gameLayer = gameLayer;
     m_isPlayer2 = isPlayer2;
     
-    // Ставим игру на паузу при создании слоя
-    if (m_gameLayer) m_gameLayer->setPaused(true);
+    // Ставим игру на паузу через pause()
+    if (m_gameLayer) m_gameLayer->pause();
     
     std::random_device rd;
     m_rng.seed(rd());
@@ -47,7 +47,6 @@ bool JumpLayer::init(GJBaseGameLayer* gameLayer, bool isPlayer2) {
 
     auto menu = CCMenu::create();
     menu->setPosition(0, 0);
-    // Приоритет выше, чем у игры, чтобы кнопка нажималась
     menu->setTouchPriority(-501); 
     
     auto btnSprite = ButtonSprite::create("ВВОД");
@@ -87,12 +86,64 @@ void JumpLayer::generateStage() {
         m_inputNode->setVisible(true);
         m_confirmBtn->setVisible(true);
         
-        // ... (логика этапов прежняя, сократил для краткости)
         if (m_currentStage == 2) {
-             int a = 10, b = 10; m_correctAnswer = 20;
-             m_questionLabel->setString("ЭТАП 2: 10 + 10 = ?");
+            std::uniform_int_distribution<> dist(10, 50);
+            int a = dist(m_rng), b = dist(m_rng);
+            m_correctAnswer = a + b;
+            m_questionLabel->setString(fmt::format("ЭТАП 2: {} + {} = ?", a, b).c_str());
         }
-        // [Остальной код логики этапов оставь как был раньше]
+        else if (m_currentStage == 3) {
+            std::uniform_int_distribution<> dist(20, 99);
+            int a = dist(m_rng), b = dist(m_rng);
+            m_correctAnswer = a - b;
+            m_questionLabel->setString(fmt::format("ЭТАП 3: {} - {} = ?", a, b).c_str());
+        }
+        else if (m_currentStage == 4) {
+            std::uniform_int_distribution<> dist(12, 35);
+            int a = dist(m_rng), b = dist(m_rng);
+            m_correctAnswer = a * b;
+            m_questionLabel->setString(fmt::format("ЭТАП 4: {} * {} = ?", a, b).c_str());
+        }
+        else if (m_currentStage == 5) {
+            std::uniform_int_distribution<> dist(5, 15);
+            int b = dist(m_rng), ans = dist(m_rng);
+            int a = b * ans;
+            m_correctAnswer = ans;
+            m_questionLabel->setString(fmt::format("ЭТАП 5: {} / {} = ?", a, b).c_str());
+        }
+        else if (m_currentStage == 6) {
+            std::uniform_int_distribution<> dist(2, 9);
+            int x = dist(m_rng), a = dist(m_rng), b = dist(m_rng);
+            int c = a * x + b;
+            m_correctAnswer = x;
+            m_questionLabel->setString(fmt::format("ЭТАП 6 (Найди x):\n{}x + {} = {}", a, b, c).c_str());
+        }
+        else if (m_currentStage == 7) {
+            std::uniform_int_distribution<> dist(2, 6);
+            int x = dist(m_rng);
+            m_correctAnswer = x * x * x;
+            m_questionLabel->setString(fmt::format("ЭТАП 7: {} ^ 3 = ?", x).c_str());
+        }
+        else if (m_currentStage == 8) {
+            std::uniform_int_distribution<> dist(-10, 10);
+            int m[2][2] = {{dist(m_rng), dist(m_rng)}, {dist(m_rng), dist(m_rng)}};
+            m_correctAnswer = (m[0][0] * m[1][1]) - (m[0][1] * m[1][0]);
+            m_questionLabel->setString(fmt::format("ЭТАП 8 (det 2x2):\n|{} {}|\n|{} {}|", m[0][0], m[0][1], m[1][0], m[1][1]).c_str());
+        }
+        else if (m_currentStage == 9) {
+            std::uniform_int_distribution<> dist(-2, 2);
+            int m[3][3];
+            for(int i=0; i<3; i++) for(int j=0; j<3; j++) m[i][j] = dist(m_rng);
+            m_correctAnswer = m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1]) - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0]) + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+            m_questionLabel->setString(fmt::format("ЭТАП 9 (Лёгкая 3x3):\n|{} {} {}|\n|{} {} {}|\n|{} {} {}|", m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]).c_str());
+        }
+        else if (m_currentStage == 10) {
+            std::uniform_int_distribution<> dist(-5, 5);
+            int m[3][3];
+            for(int i=0; i<3; i++) for(int j=0; j<3; j++) m[i][j] = dist(m_rng);
+            m_correctAnswer = m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1]) - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0]) + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+            m_questionLabel->setString(fmt::format("ЭТАП 10 (Плотная 3x3):\n|{} {} {}|\n|{} {} {}|\n|{} {} {}|", m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]).c_str());
+        }
     }
 }
 
@@ -137,9 +188,9 @@ void JumpLayer::finishTorture() {
     JumpLayer::jumpApproved = true;
     JumpLayer::isTortureActive = false;
     
-    // Снимаем паузу при завершении
+    // Снимаем паузу при завершении через resume()
     if (m_gameLayer) {
-        m_gameLayer->setPaused(false);
+        m_gameLayer->resume();
         bool isPlayer1 = !m_isPlayer2; 
         m_gameLayer->handleButton(true, 1, isPlayer1);  
         m_gameLayer->handleButton(false, 1, isPlayer1); 
