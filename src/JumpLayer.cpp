@@ -146,7 +146,6 @@ void JumpLayer::generateStage() {
     }
 }
 
-// Windows-сигнатура
 void JumpLayer::keyDown(enumKeyCodes key) {
     if (m_currentStage == 1) {
         if (key >= KEY_A && key <= KEY_Z) {
