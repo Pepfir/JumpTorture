@@ -1,4 +1,5 @@
 #include "JumpLayer.hpp"
+#include <Geode/cocos/include/FMODAudioEngine.h>
 
 JumpLayer* JumpLayer::create(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     auto ret = new JumpLayer();
@@ -16,8 +17,9 @@ bool JumpLayer::init(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     m_gameLayer = gameLayer;
     m_isPlayer2 = isPlayer2;
     
-    // Глобальная пауза игры через CCDirector
+    // Пауза игры и музыки
     CCDirector::sharedDirector()->pause();
+    FMODAudioEngine::sharedEngine()->pauseAll();
     
     std::random_device rd;
     m_rng.seed(rd());
@@ -86,6 +88,7 @@ void JumpLayer::generateStage() {
         m_inputNode->setVisible(true);
         m_confirmBtn->setVisible(true);
         
+        // ... (логика этапов прежняя, оставь свою)
         if (m_currentStage == 2) {
             std::uniform_int_distribution<> dist(10, 50);
             int a = dist(m_rng), b = dist(m_rng);
@@ -148,6 +151,12 @@ void JumpLayer::generateStage() {
 }
 
 void JumpLayer::keyDown(enumKeyCodes key, double timestamp) {
+    // Обработка Enter
+    if (key == KEY_Enter || key == KEY_KP_Enter) {
+        onConfirm(nullptr);
+        return;
+    }
+
     if (m_currentStage == 1) {
         if (key >= KEY_A && key <= KEY_Z) {
             char pressed = 'A' + (key - KEY_A);
@@ -166,7 +175,9 @@ void JumpLayer::onConfirm(CCObject* sender) {
     if (m_currentStage == 1) return;
     if (m_currentInput.empty()) return;
 
-    int answer = std::stoi(m_currentInput);
+    int answer = 0;
+    try { answer = std::stoi(m_currentInput); } catch (...) { resetTorture(); return; }
+
     if (answer == m_correctAnswer) {
         if (m_currentStage < 10) {
             m_currentStage++;
@@ -188,8 +199,9 @@ void JumpLayer::finishTorture() {
     JumpLayer::jumpApproved = true;
     JumpLayer::isTortureActive = false;
     
-    // Снимаем паузу при завершении через resume()
+    // Возобновляем игру и музыку
     CCDirector::sharedDirector()->resume();
+    FMODAudioEngine::sharedEngine()->resumeAll();
     
     if (m_gameLayer) {
         bool isPlayer1 = !m_isPlayer2; 
