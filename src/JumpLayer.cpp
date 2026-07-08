@@ -1,8 +1,6 @@
 #include "JumpLayer.hpp"
 
-// Эти переменные должны быть определены здесь, чтобы линковщик их нашел
-bool JumpLayer::isTortureActive = false;
-bool JumpLayer::jumpApproved = false;
+// Удалили строки с isTortureActive и jumpApproved, так как они теперь живут в .hpp
 
 JumpLayer* JumpLayer::create(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     auto ret = new JumpLayer();
@@ -147,7 +145,6 @@ void JumpLayer::generateStage() {
     }
 }
 
-// Теперь с timestamp, как требует Windows
 void JumpLayer::keyDown(enumKeyCodes key, double timestamp) {
     if (m_currentStage == 1) {
         if (key >= KEY_A && key <= KEY_Z) {
