@@ -16,8 +16,8 @@ bool JumpLayer::init(GJBaseGameLayer* gameLayer, bool isPlayer2) {
     m_gameLayer = gameLayer;
     m_isPlayer2 = isPlayer2;
     
-    // Ставим игру на паузу через pause()
-    if (m_gameLayer) m_gameLayer->pause();
+    // Глобальная пауза игры через CCDirector
+    CCDirector::sharedDirector()->pause();
     
     std::random_device rd;
     m_rng.seed(rd());
@@ -189,8 +189,9 @@ void JumpLayer::finishTorture() {
     JumpLayer::isTortureActive = false;
     
     // Снимаем паузу при завершении через resume()
+    CCDirector::sharedDirector()->resume();
+    
     if (m_gameLayer) {
-        m_gameLayer->resume();
         bool isPlayer1 = !m_isPlayer2; 
         m_gameLayer->handleButton(true, 1, isPlayer1);  
         m_gameLayer->handleButton(false, 1, isPlayer1); 
