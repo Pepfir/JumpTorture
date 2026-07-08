@@ -28,15 +28,14 @@ protected:
     void finishTorture();
 
     virtual void registerWithTouchDispatcher() override;
-    
-    // Windows требует timestamp, иначе не видит переопределение
     virtual void keyDown(enumKeyCodes key, double timestamp) override;
-    
     virtual bool ccTouchBegan(CCTouch* touch, CCEvent* event) override;
     virtual void keyBackClicked() override;
 
 public:
     static JumpLayer* create(GJBaseGameLayer* gameLayer, bool isPlayer2);
-    static bool isTortureActive;
-    static bool jumpApproved;
+    
+    // Используем inline, чтобы они были доступны везде без ошибок линковки
+    inline static bool isTortureActive = false;
+    inline static bool jumpApproved = false;
 };
